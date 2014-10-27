@@ -8,3 +8,13 @@ C:\Users\Thomas\Documents\Visual Studio 2013\Projects\FrequencyGenerator\Frequen
 C:\Users\Thomas\Documents\Visual Studio 2013\Projects\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.exe
 C:\Users\Thomas\Documents\Visual Studio 2013\Projects\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.pdb
 C:\Users\Thomas\Documents\Visual Studio 2013\Projects\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.csproj.ResolveComReference.cache
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\bin\Debug\FrequencyGenerator.exe.config
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.csproj.ResolveComReference.cache
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.exe
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.pdb
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\bin\Debug\FrequencyGenerator.exe
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\bin\Debug\FrequencyGenerator.pdb
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.csprojResolveAssemblyReference.cache
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.Form1.resources
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.Properties.Resources.resources
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.csproj.GenerateResource.Cache

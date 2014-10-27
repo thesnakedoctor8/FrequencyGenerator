@@ -847,6 +847,11 @@ namespace FrequencyGenerator
                     sendSignalData();
                 }
             }
+
+            freqTextBox.Text = string.Empty;
+            pkpkTextBox.Text = string.Empty;
+            rmsTextBox.Text = string.Empty;
+            dBmTextBox.Text = string.Empty;
         }
     }
 }
