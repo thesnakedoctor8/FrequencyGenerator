@@ -54,21 +54,20 @@ namespace FrequencyGenerator
                 // Enable the controls
                 enableControls();
 
-                /*
-                // TODO - Shouldn't have to initialize vars here
-                frequency = 1;
-                freqTextBox.Text = frequency.ToString();
-                pkpkVoltage = 2.5;
-                pkpkTextBox.Text = pkpkVoltage.ToString();
-                rmsVoltage = Math.Round((pkpkVoltage / (2 * 1.41421356237)), 2);
-                rmsTextBox.Text = rmsVoltage.ToString();
-                dBm = Math.Round((20 * Math.Log10((pkpkVoltage / 100) / Math.Pow(.05, .5))), 3);
-                dBmTextBox.Text = dBm.ToString();
-                waveform = 0;
-                sinusodialRadioButton.Checked = true;
-                */
                 // Tell the arduino to send the data to the PC
-                arduinoPort.WriteLine("$");
+                //Try/Catch used in case if there is a problem with the COM Port
+                try
+                {
+                    arduinoPort.WriteLine("$");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Timer - exception: " + ex.Message);
+                    disconnectButton.PerformClick();
+                    return;
+                }
+                
+                timer1.Start();
             }
         }
         
@@ -89,7 +88,7 @@ namespace FrequencyGenerator
                 //If no ports were found, Show a message and return false
                 if (ports.Length == 0)
                 {
-                    MessageBox.Show("Windows detected no connected COM Ports", "Warning");
+                    MessageBox.Show("Windows detected no connected COM Ports. Try unplugging and replugging in the USB ", "Warning");
                     Console.WriteLine("Windows detected no COM Ports connected");
                     return false;
                 }
@@ -116,7 +115,7 @@ namespace FrequencyGenerator
 
                 Console.WriteLine("Arduino COM Port not found");
                 //If no port matched after looping through all then display message and return false
-                MessageBox.Show("Windows did not find the Arduino COM Port. Pleasey re-plug in the USB cable and restart the program", "Error");
+                MessageBox.Show("Windows did not find the Arduino COM Port. Pleasey re-plugging in the USB cable and restarting the program", "Error");
                 return false;
             }
             catch (Exception ex)
@@ -142,10 +141,11 @@ namespace FrequencyGenerator
             {
                 Console.WriteLine("...Detecting Arduino...");
                 //Set a timeout in case if readLine times out
-                arduinoPort.ReadTimeout = 2000;
+                arduinoPort.ReadTimeout = 1000;
                 //Opens the serial port
                 
                 arduinoPort.Open();
+                Console.WriteLine("Makes it here");
                 arduinoPort.WriteLine("%");                                 // Tell arduino to Send '#'
                 Thread.Sleep(50);                                           // Wait 50ms for a response
                 readLine = arduinoPort.ReadLine().Trim();                   // Read a line from the serial buffer
@@ -171,9 +171,21 @@ namespace FrequencyGenerator
                 //If the connection timmed out trying to read the COM Port then return false
                 return false;
             }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine("The specified port is not open - exception: " + ex.Message);
+                //If the connection timmed out trying to read the COM Port then return false
+                return false;
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("IOException - exception: " + ex.Message);
+                //If the connection timmed out trying to read the COM Port then return false
+                return false;
+            }
             catch (Exception ex)
             {
-                Console.WriteLine("Error opening the COM Port - exception: " + ex.Message);
+                Console.WriteLine("Error - exception: " + ex.Message);
                 //If there was an error trying to open the COM Port then return false
                 return false;
             }
@@ -186,12 +198,14 @@ namespace FrequencyGenerator
             usbLabel.Text = "USB: Disconnected";
             usbLabel.ForeColor = System.Drawing.Color.Red;
 
+            timer1.Stop();
+
             try
             {
                 if (arduinoPort != null && arduinoPort.IsOpen)
                 {
                     arduinoPort.WriteLine("!");
-                    arduinoPort.Close();
+                    arduinoPort.Dispose();
                     Console.WriteLine("arduinoPort closed");
                 }
             }
@@ -329,7 +343,17 @@ namespace FrequencyGenerator
             String str = "#" + str1 + "-" + str2 + "-" + str3;
             
             Console.WriteLine("sending arduino: " + str);
-            arduinoPort.WriteLine(str);
+            
+            //Try/Catch used in case if there is a problem with the COM Port
+            try
+            {
+                arduinoPort.WriteLine(str);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("sendSignalData - exception: " + ex.Message);
+                disconnectButton.PerformClick();
+            }
         }
 
         private void generateSweepButton_Click(object sender, EventArgs e)
@@ -774,11 +798,6 @@ namespace FrequencyGenerator
 
         private void enterButton_Click(object sender, EventArgs e)
         {
-            if (arduinoPort == null || !arduinoPort.IsOpen)
-            {
-                return;
-            }
-
             if (freqTextBox.Text != string.Empty)
             {
                 if (double.Parse(freqTextBox.Text) >= .01 && double.Parse(freqTextBox.Text) <= 10000000)
@@ -852,6 +871,42 @@ namespace FrequencyGenerator
             pkpkTextBox.Text = string.Empty;
             rmsTextBox.Text = string.Empty;
             dBmTextBox.Text = string.Empty;
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Closing Application");
+
+            if (arduinoPort != null && arduinoPort.IsOpen)
+            {
+                disconnectButton.PerformClick();
+            }
+            
+            Environment.Exit(0);
+        }
+
+        private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Add stuff here", "Help");
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("PC interface for the Frequency Generator made by Group 4", "Frequency Generator");
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            //Try/Catch used in case if there is a problem with the COM Port
+            try
+            {
+                arduinoPort.WriteLine("$");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Timer - exception: " + ex.Message);
+                disconnectButton.PerformClick();
+            }
         }
     }
 }
