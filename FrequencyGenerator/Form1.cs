@@ -324,15 +324,21 @@ namespace FrequencyGenerator
         {
             RadioButton radioButton = sender as RadioButton;
 
-            if (sinusodialRadioButton.Checked)
+            if (radioButton != null)
             {
-                waveform = 0;
+                if (radioButton.Checked)
+                {
+                    if (sinusodialRadioButton.Checked)
+                    {
+                        waveform = 0;
+                    }
+                    else if (squareRadioButton.Checked)
+                    {
+                        waveform = 1;
+                    }
+                    sendSignalData();
+                }
             }
-            else if (squareRadioButton.Checked)
-            {
-                waveform = 1;
-            }
-            sendSignalData();
         }
 
         private void sendSignalData()
@@ -530,6 +536,10 @@ namespace FrequencyGenerator
                 if (xlApp == null)
                 {
                     MessageBox.Show("Excel is not installed", "Error");
+                    freqStartTextBox.Text = string.Empty;
+                    freqEndTextBox.Text = string.Empty;
+                    durationTextBox.Text = string.Empty;
+                    cyclesTextBox.Text = string.Empty;
                     return;
                 }
 
@@ -553,7 +563,14 @@ namespace FrequencyGenerator
                 saveFileDialog1.RestoreDirectory = true;
                 if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
-                    xlWorkBook.SaveAs(Path.GetFullPath(saveFileDialog1.FileName), Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+                    try
+                    {
+                        xlWorkBook.SaveAs(Path.GetFullPath(saveFileDialog1.FileName), Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+                    }
+                    catch (Exception) 
+                    {
+                        MessageBox.Show("Error saving excel file", "Error");
+                    }
                 }
 
                 xlWorkBook.Close(true, misValue, misValue);
@@ -567,6 +584,11 @@ namespace FrequencyGenerator
             {
                 MessageBox.Show(errorMessage, "Error");
             }
+
+            freqStartTextBox.Text = string.Empty;
+            freqEndTextBox.Text = string.Empty;
+            durationTextBox.Text = string.Empty;
+            cyclesTextBox.Text = string.Empty;
         }
 
         private void editTableButton_Click(object sender, EventArgs e)
@@ -653,36 +675,66 @@ namespace FrequencyGenerator
             xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
             range = xlWorkSheet.UsedRange;
 
-            if (range.Columns.Count == 2 && range.Rows.Count > 1)
+            int rowCount = range.Rows.Count;
+            int colCount = range.Columns.Count;
+            Boolean error = false;
+            String errorMessage = "";
+
+            if (colCount == 2 && rowCount > 1)
             {
-                double time1 = (range.Cells[1, 1] as Excel.Range).Value2;
-                double time2 = (range.Cells[2, 1] as Excel.Range).Value2;
-                double duration = time2 - time1;
-                if(duration >= .1)
+                // Buffer
+                frequencyLabelValue.Text = "Buffering";
+                frequencyLabelValue.Update();
+
+                List<KeyValuePair<double, double>> buffer = new List<KeyValuePair<double, double>>();
+                buffer.Add(new KeyValuePair<double, double>(0, (range.Cells[1, 2] as Excel.Range).Value2));
+                if ((range.Cells[1, 2] as Excel.Range).Value2 < .01 || (range.Cells[1, 2] as Excel.Range).Value2 > 10000000)
                 {
-                    for (int row = 1; row <= range.Rows.Count; row++)
-                    {
-                        frequency = (range.Cells[row, 2] as Excel.Range).Value2;
-                        if (frequency < .01 || frequency > 10000000)
-                        {
-                            frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
-                            frequencyLabelValue.Update();
-
-                            frequency = 1;
-                            MessageBox.Show("All frequencies must be between .01 Hz and 10 MHz", "Error");
-                            break;
-                        }
-
-                        frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
-                        frequencyLabelValue.Update();
-
-                        sendSignalData();
-                        Thread.Sleep((int)(duration * 1000));
-                    }
+                    error = true;
+                    errorMessage = "Incorrect frequency value on row: 1" + "\nAll frequencies must be between .01 Hz and 10 MHz";
                 }
-                else
+
+                for (int row = 2; row <= rowCount; row++)
                 {
-                    MessageBox.Show("Time scale too small", "Error");
+                    double time1 = (range.Cells[row - 1, 1] as Excel.Range).Value2;
+                    double time2 = (range.Cells[row, 1] as Excel.Range).Value2;
+                    double duration = time2 - time1;
+                    if(duration < .1)
+                    {
+                        error = true;
+                        errorMessage = "Time scale too small on row " + row + "\nDuration: " + duration + "\nDuration must be between above .01 seconds";
+                        break;
+                    }
+
+                    double tableFrequency = (range.Cells[row, 2] as Excel.Range).Value2;
+                    if (tableFrequency < .01 || tableFrequency > 10000000)
+                    {
+                        error = true;
+                        errorMessage = "Incorrect frequency value on row: " + row + "\nFrequency: " + tableFrequency + "\nAll frequencies must be between .01 Hz and 10 MHz";
+                        break;
+                    }
+
+                    buffer.Add(new KeyValuePair<double, double>(duration, tableFrequency));
+                }
+
+                // Error checking
+                if(error)
+                {
+                    MessageBox.Show(errorMessage, "Error");
+                    frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
+                    frequencyLabelValue.Update();
+                    return;
+                }
+
+                // Execution
+                for (int row = 0; row < rowCount; row++)
+                {
+                    frequency = buffer[row].Value;
+                    frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
+                    frequencyLabelValue.Update();
+
+                    sendSignalData();
+                    Thread.Sleep((int)(buffer[row].Key * 1000));
                 }
             }
             else
