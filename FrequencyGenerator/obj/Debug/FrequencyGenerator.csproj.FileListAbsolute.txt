@@ -18,3 +18,4 @@ C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug
 C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.Form1.resources
 C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.Properties.Resources.resources
 C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.csproj.GenerateResource.Cache
+C:\Users\Thomas\Documents\GitHub\FrequencyGenerator\FrequencyGenerator\obj\Debug\FrequencyGenerator.Form2.resources

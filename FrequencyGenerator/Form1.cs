@@ -19,6 +19,8 @@ namespace FrequencyGenerator
     public partial class Form1 : Form
     {
         // Global Variables
+        private Form2 form2 = new Form2();
+
         private static double frequency;
         private static double pkpkVoltage;
         private static double rmsVoltage;
@@ -36,6 +38,7 @@ namespace FrequencyGenerator
             InitializeComponent();
             freqStartComboBox.SelectedIndex = 0;
             freqEndComboBox.SelectedIndex = 0;
+            voltageComboBox.SelectedIndex = 0;
         }
 
         private void connectButton_Click(object sender, EventArgs e)
@@ -52,7 +55,7 @@ namespace FrequencyGenerator
                 //Enables the disconnection button
                 disconnectButton.Enabled = true;
                 // Enable the controls
-                enableControls();
+                setConnectControls(true);
 
                 // Tell the arduino to send the data to the PC
                 //Try/Catch used in case if there is a problem with the COM Port
@@ -220,7 +223,7 @@ namespace FrequencyGenerator
             //Disables the disconnection button
             disconnectButton.Enabled = false;
             // Disable the controls
-            disableControls();
+            setConnectControls(false);
         }
 
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
@@ -368,9 +371,19 @@ namespace FrequencyGenerator
             double freqEnd = 0;
             double duration = 0;
             double cycles = 0;
+            double voltage = 0;
             Boolean error = false;
             String errorMessage = "";
-                        
+
+            if (String.IsNullOrEmpty(freqStartTextBox.Text) ||
+                String.IsNullOrEmpty(freqEndTextBox.Text) ||
+                String.IsNullOrEmpty(durationTextBox.Text) ||
+                String.IsNullOrEmpty(cyclesTextBox.Text) ||
+                String.IsNullOrEmpty(voltageTextBox.Text))
+            {
+                return;
+            }
+
             freqStart = double.Parse(freqStartTextBox.Text);
             switch (freqStartComboBox.Items[freqStartComboBox.SelectedIndex].ToString())
             {
@@ -407,6 +420,17 @@ namespace FrequencyGenerator
 
             duration = double.Parse(durationTextBox.Text);
             cycles = double.Parse(cyclesTextBox.Text);
+            voltage = double.Parse(voltageTextBox.Text);
+            switch (voltageComboBox.Items[voltageComboBox.SelectedIndex].ToString())
+            {
+                case "mV":
+                    freqEnd *= 1;
+                    break;
+
+                case "V":
+                    freqEnd *= 1000;
+                    break;
+            }
 
             // Check for errors
             if (freqStart < .01 || freqStart > 10000000)
@@ -429,16 +453,32 @@ namespace FrequencyGenerator
                 error = true;
                 errorMessage += "-The Number of Steps must be between 1 cycle and 300 cycles\n";
             }
-            else if ((cycles / duration) > 10)
+            if ((cycles / duration) > 10)
             {
                 error = true;
                 errorMessage += "-The Number of Steps per second must be 10 or less\n";
+            }
+            if (voltage < 2.5 || voltage > 2500)
+            {
+                error = true;
+                errorMessage += "-The Voltage must be between 2.5 mV and 2500mV\n";
             }
 
             if (!error)
             {
                 frequency = freqStart;
-                
+
+                pkpkVoltage = voltage;
+                rmsVoltage = Math.Round((pkpkVoltage / (2 * 1.41421356237)), 2);
+                dBm = Math.Round((20 * Math.Log10((pkpkVoltage / 100) / Math.Pow(.05, .5))), 3);
+
+                pkpkLabelValue.Text = string.Format("{0:N1}", pkpkVoltage).Replace(",", "");
+                pkpkLabelValue.Update();
+                rmsLabelValue.Text = string.Format("{0:N2}", rmsVoltage).Replace(",", "");
+                rmsLabelValue.Update();
+                dBmLabelValue.Text = string.Format("{0:N3}", dBm).Replace(",", "");
+                dBmLabelValue.Update();
+
                 setAllControls(false);
                 for (double d = 0; d <= duration; d += (duration / cycles))
                 {
@@ -463,8 +503,18 @@ namespace FrequencyGenerator
             double freqEnd = 0;
             double duration = 0;
             double cycles = 0;
+            double voltage = 0;
             Boolean error = false;
             String errorMessage = "";
+
+            if (String.IsNullOrEmpty(freqStartTextBox.Text) ||
+                String.IsNullOrEmpty(freqEndTextBox.Text) ||
+                String.IsNullOrEmpty(durationTextBox.Text) ||
+                String.IsNullOrEmpty(cyclesTextBox.Text) ||
+                String.IsNullOrEmpty(voltageTextBox.Text))
+            {
+                return;
+            }
 
             freqStart = double.Parse(freqStartTextBox.Text);
             switch (freqStartComboBox.Items[freqStartComboBox.SelectedIndex].ToString())
@@ -502,6 +552,17 @@ namespace FrequencyGenerator
 
             duration = double.Parse(durationTextBox.Text);
             cycles = double.Parse(cyclesTextBox.Text);
+            voltage = double.Parse(voltageTextBox.Text);
+            switch (voltageComboBox.Items[voltageComboBox.SelectedIndex].ToString())
+            {
+                case "mV":
+                    freqEnd *= 1;
+                    break;
+
+                case "V":
+                    freqEnd *= 1000;
+                    break;
+            }
 
             // Check for errors
             if (freqStart < .01 || freqStart > 10000000)
@@ -529,6 +590,11 @@ namespace FrequencyGenerator
                 error = true;
                 errorMessage += "-The Number of Steps per second must be 10 or less\n";
             }
+            if (voltage < 2.5 || voltage > 2500)
+            {
+                error = true;
+                errorMessage += "-The Voltage must be between 2.5 mV and 2500mV\n";
+            }
 
             if (!error)
             {
@@ -540,6 +606,7 @@ namespace FrequencyGenerator
                     freqEndTextBox.Text = string.Empty;
                     durationTextBox.Text = string.Empty;
                     cyclesTextBox.Text = string.Empty;
+                    voltageTextBox.Text = string.Empty;
                     return;
                 }
 
@@ -554,6 +621,7 @@ namespace FrequencyGenerator
                 {
                     xlWorkSheet.Cells[row, 1] = d;
                     xlWorkSheet.Cells[row, 2] = freq;
+                    xlWorkSheet.Cells[row, 3] = voltage;
                     freq += (Math.Abs(freqStart - freqEnd) / cycles);
                     row++;
                 }
@@ -589,6 +657,7 @@ namespace FrequencyGenerator
             freqEndTextBox.Text = string.Empty;
             durationTextBox.Text = string.Empty;
             cyclesTextBox.Text = string.Empty;
+            voltageTextBox.Text = string.Empty;
         }
 
         private void editTableButton_Click(object sender, EventArgs e)
@@ -628,7 +697,50 @@ namespace FrequencyGenerator
 
         private void uploadTableButton_Click(object sender, EventArgs e)
         {
-            // Send to arduino
+            xlApp = new Excel.Application();
+            if (xlApp == null)
+            {
+                MessageBox.Show("Excel is not installed", "Error");
+                return;
+            }
+
+            string directoryPath = "";
+            openFileDialog1.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                directoryPath = Path.GetFullPath(openFileDialog1.FileName);
+            }
+
+            if (!Path.IsPathRooted(directoryPath))
+            {
+                xlApp.Quit();
+                MessageBox.Show("Invalid file picked", "Error");
+                return;
+            }
+
+            xlWorkBook = xlApp.Workbooks.Open(directoryPath, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+            xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+            range = xlWorkSheet.UsedRange;
+
+            Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
+            Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 600, 400);
+            Excel.Chart chartPage = myChart.Chart;
+            //TODO left off here
+            object misValue = System.Reflection.Missing.Value;
+            range = xlWorkSheet.get_Range("A1", "d5");          //change
+            chartPage.SetSourceData(range, misValue);
+            chartPage.ChartType = Excel.XlChartType.xlColumnClustered;
+            string tempPath = Path.GetTempFileName();
+            //export chart as picture file
+            chartPage.Export(tempPath, "BMP", misValue);
+            xlWorkBook.Close(true, misValue, misValue);
+            xlApp.Quit();
+            releaseObject(xlWorkSheet);
+            releaseObject(xlWorkBook);
+            releaseObject(xlApp);
+            //open form2 --- load picture to picturebox
+            Form2.picturePath = tempPath;
+            form2.Show();
         }
 
         private void createTableButton_Click(object sender, EventArgs e)
@@ -680,7 +792,7 @@ namespace FrequencyGenerator
             Boolean error = false;
             String errorMessage = "";
 
-            if (colCount == 2 && rowCount > 1)
+            if (colCount == 3 && rowCount > 1)
             {
                 // Buffer
                 frequencyLabelValue.Text = "Buffering";
@@ -693,6 +805,13 @@ namespace FrequencyGenerator
                     error = true;
                     errorMessage = "Incorrect frequency value on row: 1" + "\nAll frequencies must be between .01 Hz and 10 MHz";
                 }
+
+                if ((range.Cells[1, 3] as Excel.Range).Value2 < 2.5 || (range.Cells[1, 3] as Excel.Range).Value2 > 2500)
+                {
+                    error = true;
+                    errorMessage = "Incorrect voltage value" + "\nThe voltage must be between 2.5 mV and 2500 mV";
+                }
+
 
                 for (int row = 2; row <= rowCount; row++)
                 {
@@ -726,6 +845,17 @@ namespace FrequencyGenerator
                     return;
                 }
 
+                pkpkVoltage = (range.Cells[1, 3] as Excel.Range).Value2;
+                rmsVoltage = Math.Round((pkpkVoltage / (2 * 1.41421356237)), 2);
+                dBm = Math.Round((20 * Math.Log10((pkpkVoltage / 100) / Math.Pow(.05, .5))), 3);
+
+                pkpkLabelValue.Text = string.Format("{0:N1}", pkpkVoltage).Replace(",", "");
+                pkpkLabelValue.Update();
+                rmsLabelValue.Text = string.Format("{0:N2}", rmsVoltage).Replace(",", "");
+                rmsLabelValue.Update();
+                dBmLabelValue.Text = string.Format("{0:N3}", dBm).Replace(",", "");
+                dBmLabelValue.Update();
+
                 // Execution
                 for (int row = 0; row < rowCount; row++)
                 {
@@ -739,7 +869,17 @@ namespace FrequencyGenerator
             }
             else
             {
-                MessageBox.Show("Invalid table structure", "Error");
+                errorMessage = "Invalid table structure";
+                if (colCount != 3)
+                {
+                    errorMessage += "\nYou must have 3 columns (time, frequency, voltage)";
+                }
+                if (rowCount <= 1)
+                {
+                    errorMessage += "\nYou must have more than 1 row";
+                }
+
+                MessageBox.Show(errorMessage, "Error");
             }
 
             xlWorkBook.Close(true, null, null);
@@ -750,54 +890,31 @@ namespace FrequencyGenerator
             releaseObject(xlApp);
         }
 
-        private void enableControls()
+        private void setConnectControls(Boolean state)
         {
-            waveformGroupBox.Enabled = true;
+            waveformGroupBox.Enabled = state;
 
-            freqStartTextBox.Enabled = true;
-            freqEndTextBox.Enabled = true;
-            durationTextBox.Enabled = true;
-            cyclesTextBox.Enabled = true;
-            freqStartComboBox.Enabled = true;
-            freqEndComboBox.Enabled = true;
-            generateSweepButton.Enabled = true;
-            generateTableButton.Enabled = true;
+            freqStartTextBox.Enabled = state;
+            freqEndTextBox.Enabled = state;
+            durationTextBox.Enabled = state;
+            cyclesTextBox.Enabled = state;
+            voltageTextBox.Enabled = state;
+            freqStartComboBox.Enabled = state;
+            freqEndComboBox.Enabled = state;
+            voltageComboBox.Enabled = state;
+            generateSweepButton.Enabled = state;
+            generateTableButton.Enabled = state;
 
-            downloadTableButton.Enabled = true;
-            uploadTableButton.Enabled = true;
-            runTableButton.Enabled = true;
+            downloadTableButton.Enabled = state;
+            runTableButton.Enabled = state;
 
-            freqTextBox.Enabled = true;
-            pkpkTextBox.Enabled = true;
-            rmsTextBox.Enabled = true;
-            dBmTextBox.Enabled = true;
+            freqTextBox.Enabled = state;
+            pkpkTextBox.Enabled = state;
+            rmsTextBox.Enabled = state;
+            dBmTextBox.Enabled = state;
 
-            enterButton.Enabled = true;
-        }
-
-        private void disableControls()
-        {
-            waveformGroupBox.Enabled = false;
-
-            freqStartTextBox.Enabled = false;
-            freqEndTextBox.Enabled = false;
-            durationTextBox.Enabled = false;
-            cyclesTextBox.Enabled = false;
-            freqStartComboBox.Enabled = false;
-            freqEndComboBox.Enabled = false;
-            generateSweepButton.Enabled = false;
-            generateTableButton.Enabled = false;
-
-            downloadTableButton.Enabled = false;
-            uploadTableButton.Enabled = false;
-            runTableButton.Enabled = false;
-
-            freqTextBox.Enabled = false;
-            pkpkTextBox.Enabled = false;
-            rmsTextBox.Enabled = false;
-            dBmTextBox.Enabled = false;
-
-            enterButton.Enabled = false;
+            enterButton.Enabled = state;
+            defaultsButton.Enabled = state;
         }
 
         private void setAllControls(Boolean state)
@@ -814,7 +931,7 @@ namespace FrequencyGenerator
             generateTableButton.Enabled = state;
 
             downloadTableButton.Enabled = state;
-            uploadTableButton.Enabled = state;
+            generateChartButton.Enabled = state;
             editTableButton.Enabled = state;
             createTableButton.Enabled = state;
             runTableButton.Enabled = state;
@@ -828,6 +945,7 @@ namespace FrequencyGenerator
             dBmTextBox.Enabled = state;
 
             enterButton.Enabled = state;
+            defaultsButton.Enabled = state;
         }
 
         private void releaseObject(object obj)
@@ -959,6 +1077,20 @@ namespace FrequencyGenerator
                 Console.WriteLine("Timer - exception: " + ex.Message);
                 disconnectButton.PerformClick();
             }
+        }
+
+        private void defaultsButton_Click(object sender, EventArgs e)
+        {
+            frequency = 1;
+            updateFrequencyLabel();
+            pkpkVoltage = 2.5;
+            updatePkPkLabel();
+            rmsVoltage = Math.Round((pkpkVoltage / (2 * 1.41421356237)), 2);
+            updateRmsLabel();
+            dBm = Math.Round((20 * Math.Log10((pkpkVoltage / 100) / Math.Pow(.05, .5))), 3);
+            updatedBmLabel();
+
+            sendSignalData();
         }
     }
 }
