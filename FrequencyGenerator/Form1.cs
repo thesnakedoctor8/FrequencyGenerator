@@ -695,7 +695,7 @@ namespace FrequencyGenerator
             // Download from arduino
         }
 
-        private void uploadTableButton_Click(object sender, EventArgs e)
+        private void generateChartButton_Click(object sender, EventArgs e)
         {
             xlApp = new Excel.Application();
             if (xlApp == null)
@@ -723,16 +723,32 @@ namespace FrequencyGenerator
             range = xlWorkSheet.UsedRange;
 
             Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
-            Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 600, 400);
+            Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(160, 80, 600, 400);
             Excel.Chart chartPage = myChart.Chart;
-            //TODO left off here
+            chartPage.HasTitle = true;
+            chartPage.ChartTitle.Text = "Frequency Sweep";
+            chartPage.HasLegend = false;
+
+            var yAxis = (Excel.Axis)chartPage.Axes(Excel.XlAxisType.xlValue, Excel.XlAxisGroup.xlPrimary);
+            yAxis.HasTitle = true;
+            yAxis.AxisTitle.Text = "Frequency (Hz)";
+            yAxis.AxisTitle.Orientation = Excel.XlOrientation.xlUpward;
+
+            Excel.Axis xAxis = (Excel.Axis)chartPage.Axes(Excel.XlAxisType.xlCategory, Excel.XlAxisGroup.xlPrimary);
+            xAxis.HasTitle = true;
+            xAxis.AxisTitle.Text = "Time (seconds)";
+            xAxis.AxisTitle.Orientation = Excel.XlOrientation.xlHorizontal;
+
             object misValue = System.Reflection.Missing.Value;
-            range = xlWorkSheet.get_Range("A1", "d5");          //change
-            chartPage.SetSourceData(range, misValue);
-            chartPage.ChartType = Excel.XlChartType.xlColumnClustered;
+            Excel.SeriesCollection seriesCollection = chartPage.SeriesCollection();
+
+            Excel.Series series1 = seriesCollection.NewSeries();
+            series1.XValues = xlWorkSheet.get_Range("A1", "A" + range.Rows.Count.ToString());
+            series1.Values = xlWorkSheet.get_Range("B1", "B" + range.Rows.Count.ToString());
+
+            chartPage.ChartType = Excel.XlChartType.xlLineMarkers;
             string tempPath = Path.GetTempFileName();
-            //export chart as picture file
-            chartPage.Export(tempPath, "BMP", misValue);
+            chartPage.Export(tempPath, "BMP", misValue);    // not sure if this works
             xlWorkBook.Close(true, misValue, misValue);
             xlApp.Quit();
             releaseObject(xlWorkSheet);
@@ -740,6 +756,7 @@ namespace FrequencyGenerator
             releaseObject(xlApp);
             //open form2 --- load picture to picturebox
             Form2.picturePath = tempPath;
+            //Console.WriteLine("path: " + Form2.picturePath);
             form2.Show();
         }
 

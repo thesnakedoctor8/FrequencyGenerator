@@ -21,8 +21,10 @@ namespace FrequencyGenerator
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            //pictureBox1.Image = new Bitmap(picturePath);
-            Console.WriteLine("picturePath: " + picturePath);
+            //TODO - fix this
+            pictureBox1.ImageLocation = @"C:\Users\Thomas\Downloads\tmpD99E.bmp";
+            pictureBox1.Load();
+            //Console.WriteLine("picturePath: " + picturePath);
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)

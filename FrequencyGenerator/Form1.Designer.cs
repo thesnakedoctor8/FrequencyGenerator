@@ -410,7 +410,7 @@
             this.generateChartButton.TabIndex = 34;
             this.generateChartButton.Text = "Generate Chart";
             this.generateChartButton.UseVisualStyleBackColor = true;
-            this.generateChartButton.Click += new System.EventHandler(this.uploadTableButton_Click);
+            this.generateChartButton.Click += new System.EventHandler(this.generateChartButton_Click);
             // 
             // editTableButton
             // 
