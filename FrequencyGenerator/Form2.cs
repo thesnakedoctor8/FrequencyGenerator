@@ -34,15 +34,15 @@ namespace FrequencyGenerator
                 switch (saveFileDialog1.FilterIndex)
                 {
                     case 1:
-                        pictureBox1.Image.Save(picturePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        pictureBox1.Image.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Jpeg);
                         break;
 
                     case 2:
-                        pictureBox1.Image.Save(picturePath, System.Drawing.Imaging.ImageFormat.Bmp);
+                        pictureBox1.Image.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Bmp);
                         break;
 
                     case 3:
-                        pictureBox1.Image.Save(picturePath, System.Drawing.Imaging.ImageFormat.Gif);
+                        pictureBox1.Image.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Gif);
                         break;
                 }
             }

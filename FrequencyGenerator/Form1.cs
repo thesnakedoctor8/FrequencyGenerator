@@ -744,7 +744,8 @@ namespace FrequencyGenerator
             xAxis.HasTitle = true;
             xAxis.AxisTitle.Text = "Time (seconds)";
             xAxis.AxisTitle.Orientation = Excel.XlOrientation.xlHorizontal;
-            xAxis.MaximumScale = (range.Cells[range.Rows.Count, 1] as Excel.Range).Value2;
+            xAxis.MinimumScale = 0;
+            xAxis.MaximumScale = 1.05 * (range.Cells[range.Rows.Count, 1] as Excel.Range).Value2;
             
             tempPath = Path.GetTempFileName();
             chartPage.Export(tempPath, "BMP", misValue);
