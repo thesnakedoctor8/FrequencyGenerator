@@ -19,14 +19,13 @@ namespace FrequencyGenerator
     public partial class Form1 : Form
     {
         // Global Variables
-        private Form2 form2 = new Form2();
-
         private static double frequency;
         private static double pkpkVoltage;
         private static double rmsVoltage;
         private static double dBm;
         private static double waveform;        // Sin = 0 Square = 1
         private static string readLine;
+        public static string tempPath;
 
         Excel.Application xlApp;
         Excel.Workbook xlWorkBook;
@@ -728,8 +727,15 @@ namespace FrequencyGenerator
             chartPage.HasTitle = true;
             chartPage.ChartTitle.Text = "Frequency Sweep";
             chartPage.HasLegend = false;
+            chartPage.ChartType = Excel.XlChartType.xlXYScatterSmooth;
 
-            var yAxis = (Excel.Axis)chartPage.Axes(Excel.XlAxisType.xlValue, Excel.XlAxisGroup.xlPrimary);
+            object misValue = System.Reflection.Missing.Value;
+            Excel.SeriesCollection seriesCollection = chartPage.SeriesCollection();
+            Excel.Series series1 = seriesCollection.NewSeries();
+            series1.XValues = xlWorkSheet.get_Range("A1", "A" + range.Rows.Count.ToString());
+            series1.Values = xlWorkSheet.get_Range("B1", "B" + range.Rows.Count.ToString());
+
+            Excel.Axis yAxis = (Excel.Axis)chartPage.Axes(Excel.XlAxisType.xlValue, Excel.XlAxisGroup.xlPrimary);
             yAxis.HasTitle = true;
             yAxis.AxisTitle.Text = "Frequency (Hz)";
             yAxis.AxisTitle.Orientation = Excel.XlOrientation.xlUpward;
@@ -738,25 +744,18 @@ namespace FrequencyGenerator
             xAxis.HasTitle = true;
             xAxis.AxisTitle.Text = "Time (seconds)";
             xAxis.AxisTitle.Orientation = Excel.XlOrientation.xlHorizontal;
-
-            object misValue = System.Reflection.Missing.Value;
-            Excel.SeriesCollection seriesCollection = chartPage.SeriesCollection();
-
-            Excel.Series series1 = seriesCollection.NewSeries();
-            series1.XValues = xlWorkSheet.get_Range("A1", "A" + range.Rows.Count.ToString());
-            series1.Values = xlWorkSheet.get_Range("B1", "B" + range.Rows.Count.ToString());
-
-            chartPage.ChartType = Excel.XlChartType.xlLineMarkers;
-            string tempPath = Path.GetTempFileName();
-            chartPage.Export(tempPath, "BMP", misValue);    // not sure if this works
-            xlWorkBook.Close(true, misValue, misValue);
+            xAxis.MaximumScale = (range.Cells[range.Rows.Count, 1] as Excel.Range).Value2;
+            
+            tempPath = Path.GetTempFileName();
+            chartPage.Export(tempPath, "BMP", misValue);
+            xlWorkBook.Close(false, misValue, misValue);
             xlApp.Quit();
             releaseObject(xlWorkSheet);
             releaseObject(xlWorkBook);
             releaseObject(xlApp);
             //open form2 --- load picture to picturebox
-            Form2.picturePath = tempPath;
-            //Console.WriteLine("path: " + Form2.picturePath);
+            Form2 form2 = new Form2();
+            form2.picturePath = tempPath;
             form2.Show();
         }
 
@@ -828,7 +827,6 @@ namespace FrequencyGenerator
                     error = true;
                     errorMessage = "Incorrect voltage value" + "\nThe voltage must be between 2.5 mV and 2500 mV";
                 }
-
 
                 for (int row = 2; row <= rowCount; row++)
                 {

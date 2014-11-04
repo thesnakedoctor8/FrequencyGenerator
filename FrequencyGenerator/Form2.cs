@@ -12,7 +12,7 @@ namespace FrequencyGenerator
 {
     public partial class Form2 : Form
     {
-        public static string picturePath;
+        public string picturePath;
 
         public Form2()
         {
@@ -21,26 +21,42 @@ namespace FrequencyGenerator
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            //TODO - fix this
-            pictureBox1.ImageLocation = @"C:\Users\Thomas\Downloads\tmpD99E.bmp";
+            pictureBox1.ImageLocation = picturePath;
             pictureBox1.Load();
-            //Console.WriteLine("picturePath: " + picturePath);
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //saveas
+            saveFileDialog1.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+            saveFileDialog1.RestoreDirectory = true;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                switch (saveFileDialog1.FilterIndex)
+                {
+                    case 1:
+                        pictureBox1.Image.Save(picturePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        break;
+
+                    case 2:
+                        pictureBox1.Image.Save(picturePath, System.Drawing.Imaging.ImageFormat.Bmp);
+                        break;
+
+                    case 3:
+                        pictureBox1.Image.Save(picturePath, System.Drawing.Imaging.ImageFormat.Gif);
+                        break;
+                }
+            }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //exit
+            this.Close();
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //copy to clipboard
-            //System.Windows.Forms.Clipboard.SetText(debugTB2.Text);
+            Image img = Image.FromFile(picturePath);
+            Clipboard.SetImage(img);
         }
 
         private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
