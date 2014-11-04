@@ -36,7 +36,7 @@
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.downloadTableButton = new System.Windows.Forms.Button();
+            this.stopRunButton = new System.Windows.Forms.Button();
             this.changePkpkLabel = new System.Windows.Forms.Label();
             this.pkpkLabel = new System.Windows.Forms.Label();
             this.arduinoPort = new System.IO.Ports.SerialPort(this.components);
@@ -51,6 +51,10 @@
             this.freqEndTextBox = new System.Windows.Forms.TextBox();
             this.durationTextBox = new System.Windows.Forms.TextBox();
             this.sweepGroupBox = new System.Windows.Forms.GroupBox();
+            this.stopButton = new System.Windows.Forms.Button();
+            this.voltageComboBox = new System.Windows.Forms.ComboBox();
+            this.voltageTextBox = new System.Windows.Forms.TextBox();
+            this.voltageLabel = new System.Windows.Forms.Label();
             this.generateTableButton = new System.Windows.Forms.Button();
             this.generateSweepButton = new System.Windows.Forms.Button();
             this.cyclesTextBox = new System.Windows.Forms.TextBox();
@@ -71,6 +75,7 @@
             this.sinusodialRadioButton = new System.Windows.Forms.RadioButton();
             this.squareRadioButton = new System.Windows.Forms.RadioButton();
             this.signalGroupBox = new System.Windows.Forms.GroupBox();
+            this.defaultsButton = new System.Windows.Forms.Button();
             this.enterButton = new System.Windows.Forms.Button();
             this.dbmUnitsLabel2 = new System.Windows.Forms.Label();
             this.dBmTextBox = new System.Windows.Forms.TextBox();
@@ -94,10 +99,8 @@
             this.pkpkLabelValue = new System.Windows.Forms.Label();
             this.frequencyLabelValue = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.voltageTextBox = new System.Windows.Forms.TextBox();
-            this.voltageLabel = new System.Windows.Forms.Label();
-            this.voltageComboBox = new System.Windows.Forms.ComboBox();
-            this.defaultsButton = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             this.sweepGroupBox.SuspendLayout();
             this.tableControlsGroupBox.SuspendLayout();
@@ -145,28 +148,28 @@
             // helpToolStripMenuItem1
             // 
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
-            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
             this.helpToolStripMenuItem1.Text = "Help";
             this.helpToolStripMenuItem1.Click += new System.EventHandler(this.helpToolStripMenuItem1_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // downloadTableButton
+            // stopRunButton
             // 
-            this.downloadTableButton.Enabled = false;
-            this.downloadTableButton.Location = new System.Drawing.Point(9, 19);
-            this.downloadTableButton.Name = "downloadTableButton";
-            this.downloadTableButton.Size = new System.Drawing.Size(101, 23);
-            this.downloadTableButton.TabIndex = 33;
-            this.downloadTableButton.Text = "Extra";
-            this.toolTip1.SetToolTip(this.downloadTableButton, "Download a table from the Signal Generator");
-            this.downloadTableButton.UseVisualStyleBackColor = true;
-            this.downloadTableButton.Click += new System.EventHandler(this.downloadTableButton_Click);
+            this.stopRunButton.Enabled = false;
+            this.stopRunButton.Location = new System.Drawing.Point(10, 134);
+            this.stopRunButton.Name = "stopRunButton";
+            this.stopRunButton.Size = new System.Drawing.Size(101, 23);
+            this.stopRunButton.TabIndex = 33;
+            this.stopRunButton.Text = "Stop Run";
+            this.toolTip1.SetToolTip(this.stopRunButton, "Download a table from the Signal Generator");
+            this.stopRunButton.UseVisualStyleBackColor = true;
+            this.stopRunButton.Click += new System.EventHandler(this.stopRunButton_Click);
             // 
             // changePkpkLabel
             // 
@@ -305,6 +308,7 @@
             // 
             // sweepGroupBox
             // 
+            this.sweepGroupBox.Controls.Add(this.stopButton);
             this.sweepGroupBox.Controls.Add(this.voltageComboBox);
             this.sweepGroupBox.Controls.Add(this.voltageTextBox);
             this.sweepGroupBox.Controls.Add(this.voltageLabel);
@@ -329,6 +333,49 @@
             this.sweepGroupBox.TabIndex = 32;
             this.sweepGroupBox.TabStop = false;
             this.sweepGroupBox.Text = "Generate Sweep";
+            // 
+            // stopButton
+            // 
+            this.stopButton.Enabled = false;
+            this.stopButton.Location = new System.Drawing.Point(216, 165);
+            this.stopButton.Name = "stopButton";
+            this.stopButton.Size = new System.Drawing.Size(47, 23);
+            this.stopButton.TabIndex = 61;
+            this.stopButton.Text = "Stop";
+            this.stopButton.UseVisualStyleBackColor = true;
+            this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
+            // 
+            // voltageComboBox
+            // 
+            this.voltageComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.voltageComboBox.Enabled = false;
+            this.voltageComboBox.FormattingEnabled = true;
+            this.voltageComboBox.Items.AddRange(new object[] {
+            "mV",
+            "V"});
+            this.voltageComboBox.Location = new System.Drawing.Point(216, 136);
+            this.voltageComboBox.Name = "voltageComboBox";
+            this.voltageComboBox.Size = new System.Drawing.Size(47, 21);
+            this.voltageComboBox.TabIndex = 41;
+            // 
+            // voltageTextBox
+            // 
+            this.voltageTextBox.Enabled = false;
+            this.voltageTextBox.Location = new System.Drawing.Point(115, 136);
+            this.voltageTextBox.Name = "voltageTextBox";
+            this.voltageTextBox.Size = new System.Drawing.Size(95, 20);
+            this.voltageTextBox.TabIndex = 40;
+            // 
+            // voltageLabel
+            // 
+            this.voltageLabel.AutoSize = true;
+            this.voltageLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.voltageLabel.ForeColor = System.Drawing.Color.Black;
+            this.voltageLabel.Location = new System.Drawing.Point(6, 139);
+            this.voltageLabel.Name = "voltageLabel";
+            this.voltageLabel.Size = new System.Drawing.Size(43, 13);
+            this.voltageLabel.TabIndex = 39;
+            this.voltageLabel.Text = "Voltage";
             // 
             // generateTableButton
             // 
@@ -404,7 +451,7 @@
             // 
             // generateChartButton
             // 
-            this.generateChartButton.Location = new System.Drawing.Point(9, 48);
+            this.generateChartButton.Location = new System.Drawing.Point(10, 18);
             this.generateChartButton.Name = "generateChartButton";
             this.generateChartButton.Size = new System.Drawing.Size(101, 23);
             this.generateChartButton.TabIndex = 34;
@@ -414,7 +461,7 @@
             // 
             // editTableButton
             // 
-            this.editTableButton.Location = new System.Drawing.Point(9, 77);
+            this.editTableButton.Location = new System.Drawing.Point(10, 47);
             this.editTableButton.Name = "editTableButton";
             this.editTableButton.Size = new System.Drawing.Size(101, 23);
             this.editTableButton.TabIndex = 35;
@@ -424,7 +471,7 @@
             // 
             // createTableButton
             // 
-            this.createTableButton.Location = new System.Drawing.Point(9, 106);
+            this.createTableButton.Location = new System.Drawing.Point(10, 76);
             this.createTableButton.Name = "createTableButton";
             this.createTableButton.Size = new System.Drawing.Size(101, 23);
             this.createTableButton.TabIndex = 36;
@@ -435,7 +482,7 @@
             // runTableButton
             // 
             this.runTableButton.Enabled = false;
-            this.runTableButton.Location = new System.Drawing.Point(9, 135);
+            this.runTableButton.Location = new System.Drawing.Point(10, 105);
             this.runTableButton.Name = "runTableButton";
             this.runTableButton.Size = new System.Drawing.Size(101, 23);
             this.runTableButton.TabIndex = 37;
@@ -451,14 +498,14 @@
             // tableControlsGroupBox
             // 
             this.tableControlsGroupBox.Controls.Add(this.runTableButton);
-            this.tableControlsGroupBox.Controls.Add(this.downloadTableButton);
+            this.tableControlsGroupBox.Controls.Add(this.stopRunButton);
             this.tableControlsGroupBox.Controls.Add(this.createTableButton);
             this.tableControlsGroupBox.Controls.Add(this.generateChartButton);
             this.tableControlsGroupBox.Controls.Add(this.editTableButton);
             this.tableControlsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tableControlsGroupBox.Location = new System.Drawing.Point(296, 276);
             this.tableControlsGroupBox.Name = "tableControlsGroupBox";
-            this.tableControlsGroupBox.Size = new System.Drawing.Size(122, 168);
+            this.tableControlsGroupBox.Size = new System.Drawing.Size(122, 166);
             this.tableControlsGroupBox.TabIndex = 38;
             this.tableControlsGroupBox.TabStop = false;
             this.tableControlsGroupBox.Text = "Table Controls";
@@ -568,6 +615,17 @@
             this.signalGroupBox.TabIndex = 55;
             this.signalGroupBox.TabStop = false;
             this.signalGroupBox.Text = "Enter Signal";
+            // 
+            // defaultsButton
+            // 
+            this.defaultsButton.Enabled = false;
+            this.defaultsButton.Location = new System.Drawing.Point(9, 135);
+            this.defaultsButton.Name = "defaultsButton";
+            this.defaultsButton.Size = new System.Drawing.Size(75, 23);
+            this.defaultsButton.TabIndex = 60;
+            this.defaultsButton.Text = "Defaults";
+            this.defaultsButton.UseVisualStyleBackColor = true;
+            this.defaultsButton.Click += new System.EventHandler(this.defaultsButton_Click);
             // 
             // enterButton
             // 
@@ -804,48 +862,21 @@
             this.timer1.Interval = 250;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // voltageTextBox
+            // backgroundWorker1
             // 
-            this.voltageTextBox.Enabled = false;
-            this.voltageTextBox.Location = new System.Drawing.Point(115, 136);
-            this.voltageTextBox.Name = "voltageTextBox";
-            this.voltageTextBox.Size = new System.Drawing.Size(95, 20);
-            this.voltageTextBox.TabIndex = 40;
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
-            // voltageLabel
+            // backgroundWorker2
             // 
-            this.voltageLabel.AutoSize = true;
-            this.voltageLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.voltageLabel.ForeColor = System.Drawing.Color.Black;
-            this.voltageLabel.Location = new System.Drawing.Point(6, 139);
-            this.voltageLabel.Name = "voltageLabel";
-            this.voltageLabel.Size = new System.Drawing.Size(43, 13);
-            this.voltageLabel.TabIndex = 39;
-            this.voltageLabel.Text = "Voltage";
-            // 
-            // voltageComboBox
-            // 
-            this.voltageComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.voltageComboBox.Enabled = false;
-            this.voltageComboBox.FormattingEnabled = true;
-            this.voltageComboBox.Items.AddRange(new object[] {
-            "mV",
-            "V"});
-            this.voltageComboBox.Location = new System.Drawing.Point(216, 136);
-            this.voltageComboBox.Name = "voltageComboBox";
-            this.voltageComboBox.Size = new System.Drawing.Size(47, 21);
-            this.voltageComboBox.TabIndex = 41;
-            // 
-            // defaultsButton
-            // 
-            this.defaultsButton.Enabled = false;
-            this.defaultsButton.Location = new System.Drawing.Point(9, 135);
-            this.defaultsButton.Name = "defaultsButton";
-            this.defaultsButton.Size = new System.Drawing.Size(75, 23);
-            this.defaultsButton.TabIndex = 60;
-            this.defaultsButton.Text = "Defaults";
-            this.defaultsButton.UseVisualStyleBackColor = true;
-            this.defaultsButton.Click += new System.EventHandler(this.defaultsButton_Click);
+            this.backgroundWorker2.WorkerReportsProgress = true;
+            this.backgroundWorker2.WorkerSupportsCancellation = true;
+            this.backgroundWorker2.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
+            this.backgroundWorker2.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker2_ProgressChanged);
+            this.backgroundWorker2.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker2_RunWorkerCompleted);
             // 
             // Form1
             // 
@@ -904,7 +935,7 @@
         private System.Windows.Forms.ComboBox freqEndComboBox;
         private System.Windows.Forms.ComboBox freqStartComboBox;
         private System.Windows.Forms.Button generateSweepButton;
-        private System.Windows.Forms.Button downloadTableButton;
+        private System.Windows.Forms.Button stopRunButton;
         private System.Windows.Forms.Button generateChartButton;
         private System.Windows.Forms.Button editTableButton;
         private System.Windows.Forms.Button createTableButton;
@@ -953,6 +984,9 @@
         private System.Windows.Forms.Label voltageLabel;
         private System.Windows.Forms.ComboBox voltageComboBox;
         private System.Windows.Forms.Button defaultsButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker2;
+        private System.Windows.Forms.Button stopButton;
     }
 }
 

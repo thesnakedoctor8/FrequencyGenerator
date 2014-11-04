@@ -26,6 +26,12 @@ namespace FrequencyGenerator
         private static double waveform;        // Sin = 0 Square = 1
         private static string readLine;
         public static string tempPath;
+        
+        private double freqStart = 0;
+        private double freqEnd = 0;
+        private double duration = 0;
+        private double cycles = 0;
+        private double voltage = 0;
 
         Excel.Application xlApp;
         Excel.Workbook xlWorkBook;
@@ -366,11 +372,11 @@ namespace FrequencyGenerator
 
         private void generateSweepButton_Click(object sender, EventArgs e)
         {
-            double freqStart = 0;
-            double freqEnd = 0;
-            double duration = 0;
-            double cycles = 0;
-            double voltage = 0;
+            freqStart = 0;
+            freqEnd = 0;
+            duration = 0;
+            cycles = 0;
+            voltage = 0;
             Boolean error = false;
             String errorMessage = "";
 
@@ -384,6 +390,7 @@ namespace FrequencyGenerator
             }
 
             freqStart = double.Parse(freqStartTextBox.Text);
+            Console.WriteLine("Makes it here");
             switch (freqStartComboBox.Items[freqStartComboBox.SelectedIndex].ToString())
             {
                 case "Hz":
@@ -479,21 +486,55 @@ namespace FrequencyGenerator
                 dBmLabelValue.Update();
 
                 setAllControls(false);
-                for (double d = 0; d <= duration; d += (duration / cycles))
-                {
-                    frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
-                    frequencyLabelValue.Update();
-
-                    sendSignalData();
-                    Thread.Sleep((int)((duration / cycles) * 1000));
-                    frequency += (Math.Abs(freqStart - freqEnd) / cycles);
-                }
-                setAllControls(true);
+                stopButton.Enabled = true;
+                backgroundWorker1.RunWorkerAsync();      
             }
             else
             {
                 MessageBox.Show(errorMessage, "Error");
-            }                        
+            }      
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            for (double d = 0; d <= duration; d += (duration / cycles))
+            {
+                worker.ReportProgress((int)(d / duration));
+
+                sendSignalData();
+
+                if (worker.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                Thread.Sleep((int)((duration / cycles) * 1000));
+                frequency += (Math.Abs(freqStart - freqEnd) / cycles);
+            }
+        }
+
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
+            frequencyLabelValue.Update();
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            setAllControls(true);
+            stopButton.Enabled = false;
+        }
+
+        private void stopButton_Click(object sender, EventArgs e)
+        {
+            // Cancel the asynchronous operation. 
+            backgroundWorker1.CancelAsync();
+
+            setAllControls(true);
+            stopButton.Enabled = false;
         }
 
         private void generateTableButton_Click(object sender, EventArgs e)
@@ -687,11 +728,6 @@ namespace FrequencyGenerator
             xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
 
             xlApp.Visible = true;
-        }
-
-        private void downloadTableButton_Click(object sender, EventArgs e)
-        {
-            // Download from arduino
         }
 
         private void generateChartButton_Click(object sender, EventArgs e)
@@ -906,6 +942,48 @@ namespace FrequencyGenerator
             releaseObject(xlApp);
         }
 
+        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            for (double d = 0; d <= duration; d += (duration / cycles))
+            {
+                worker.ReportProgress((int)(d / duration));
+
+                sendSignalData();
+
+                if (worker.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                Thread.Sleep((int)((duration / cycles) * 1000));
+                frequency += (Math.Abs(freqStart - freqEnd) / cycles);
+            }
+        }
+
+        private void backgroundWorker2_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
+            frequencyLabelValue.Update();
+        }
+
+        private void backgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            setAllControls(true);
+            stopButton.Enabled = false;
+        }
+        
+        private void stopRunButton_Click(object sender, EventArgs e)
+        {
+            // Cancel the asynchronous operation. 
+            backgroundWorker1.CancelAsync();
+
+            setAllControls(true);
+            stopButton.Enabled = false;
+        }
+
         private void setConnectControls(Boolean state)
         {
             waveformGroupBox.Enabled = state;
@@ -921,7 +999,7 @@ namespace FrequencyGenerator
             generateSweepButton.Enabled = state;
             generateTableButton.Enabled = state;
 
-            downloadTableButton.Enabled = state;
+            stopRunButton.Enabled = state;
             runTableButton.Enabled = state;
 
             freqTextBox.Enabled = state;
@@ -943,10 +1021,12 @@ namespace FrequencyGenerator
             cyclesTextBox.Enabled = state;
             freqStartComboBox.Enabled = state;
             freqEndComboBox.Enabled = state;
+            voltageComboBox.Enabled = state;
+            voltageTextBox.Enabled = state;
             generateSweepButton.Enabled = state;
             generateTableButton.Enabled = state;
 
-            downloadTableButton.Enabled = state;
+            stopRunButton.Enabled = state;
             generateChartButton.Enabled = state;
             editTableButton.Enabled = state;
             createTableButton.Enabled = state;
