@@ -101,6 +101,7 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker3 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             this.sweepGroupBox.SuspendLayout();
             this.tableControlsGroupBox.SuspendLayout();
@@ -300,7 +301,7 @@
             // 
             this.durationTextBox.Enabled = false;
             this.durationTextBox.Location = new System.Drawing.Point(115, 78);
-            this.durationTextBox.MaxLength = 2;
+            this.durationTextBox.MaxLength = 4;
             this.durationTextBox.Name = "durationTextBox";
             this.durationTextBox.Size = new System.Drawing.Size(95, 20);
             this.durationTextBox.TabIndex = 28;
@@ -362,6 +363,7 @@
             // 
             this.voltageTextBox.Enabled = false;
             this.voltageTextBox.Location = new System.Drawing.Point(115, 136);
+            this.voltageTextBox.MaxLength = 4;
             this.voltageTextBox.Name = "voltageTextBox";
             this.voltageTextBox.Size = new System.Drawing.Size(95, 20);
             this.voltageTextBox.TabIndex = 40;
@@ -404,6 +406,7 @@
             // 
             this.cyclesTextBox.Enabled = false;
             this.cyclesTextBox.Location = new System.Drawing.Point(115, 107);
+            this.cyclesTextBox.MaxLength = 5;
             this.cyclesTextBox.Name = "cyclesTextBox";
             this.cyclesTextBox.Size = new System.Drawing.Size(95, 20);
             this.cyclesTextBox.TabIndex = 33;
@@ -872,11 +875,17 @@
             // 
             // backgroundWorker2
             // 
-            this.backgroundWorker2.WorkerReportsProgress = true;
             this.backgroundWorker2.WorkerSupportsCancellation = true;
             this.backgroundWorker2.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
-            this.backgroundWorker2.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker2_ProgressChanged);
             this.backgroundWorker2.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker2_RunWorkerCompleted);
+            // 
+            // backgroundWorker3
+            // 
+            this.backgroundWorker3.WorkerReportsProgress = true;
+            this.backgroundWorker3.WorkerSupportsCancellation = true;
+            this.backgroundWorker3.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker3_DoWork);
+            this.backgroundWorker3.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker3_ProgressChanged);
+            this.backgroundWorker3.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker3_RunWorkerCompleted);
             // 
             // Form1
             // 
@@ -987,6 +996,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
         private System.Windows.Forms.Button stopButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorker3;
     }
 }
 

@@ -37,6 +37,9 @@ namespace FrequencyGenerator
         Excel.Workbook xlWorkBook;
         Excel.Worksheet xlWorkSheet;
         Excel.Range range;
+        object misValue;
+        Boolean error;
+        String errorMessage;
 
         public Form1()
         {
@@ -377,8 +380,8 @@ namespace FrequencyGenerator
             duration = 0;
             cycles = 0;
             voltage = 0;
-            Boolean error = false;
-            String errorMessage = "";
+            error = false;
+            errorMessage = "";
 
             if (String.IsNullOrEmpty(freqStartTextBox.Text) ||
                 String.IsNullOrEmpty(freqEndTextBox.Text) ||
@@ -390,7 +393,6 @@ namespace FrequencyGenerator
             }
 
             freqStart = double.Parse(freqStartTextBox.Text);
-            Console.WriteLine("Makes it here");
             switch (freqStartComboBox.Items[freqStartComboBox.SelectedIndex].ToString())
             {
                 case "Hz":
@@ -405,7 +407,6 @@ namespace FrequencyGenerator
                     freqStart *= 1000000;
                     break;
             }
-            Console.WriteLine("freqStart", freqStart);
 
             freqEnd = double.Parse(freqEndTextBox.Text);
             switch (freqEndComboBox.Items[freqEndComboBox.SelectedIndex].ToString())
@@ -422,7 +423,6 @@ namespace FrequencyGenerator
                     freqEnd *= 1000000;
                     break;
             }
-            Console.WriteLine("freqStart", freqStart);
 
             duration = double.Parse(durationTextBox.Text);
             cycles = double.Parse(cyclesTextBox.Text);
@@ -430,11 +430,11 @@ namespace FrequencyGenerator
             switch (voltageComboBox.Items[voltageComboBox.SelectedIndex].ToString())
             {
                 case "mV":
-                    freqEnd *= 1;
+                    voltage *= 1;
                     break;
 
                 case "V":
-                    freqEnd *= 1000;
+                    voltage *= 1000;
                     break;
             }
 
@@ -449,20 +449,20 @@ namespace FrequencyGenerator
                 error = true;
                 errorMessage += "-The End Frequency must be between .01 Hz and 10 MHz\n";
             }
-            if (duration < 1 || duration > 30)
+            if (duration < 1 || duration > 1250)
             {
                 error = true;
-                errorMessage += "-The Duration must be between 1 second and 30 seconds\n";
+                errorMessage += "-The Duration must be between 1 second and 1,250 seconds\n";
             }
-            if (cycles < 1 || cycles > 300)
+            if (cycles < 1 || cycles > 10000)
             {
                 error = true;
-                errorMessage += "-The Number of Steps must be between 1 cycle and 300 cycles\n";
+                errorMessage += "-The Number of Steps must be between 1 cycle and 10,000 cycles\n";
             }
-            if ((cycles / duration) > 10)
+            if ((cycles / duration) > 8)
             {
                 error = true;
-                errorMessage += "-The Number of Steps per second must be 10 or less\n";
+                errorMessage += "-The Number of Steps per second must be 8 or less\n";
             }
             if (voltage < 2.5 || voltage > 2500)
             {
@@ -472,6 +472,8 @@ namespace FrequencyGenerator
 
             if (!error)
             {
+                timer1.Stop();
+
                 frequency = freqStart;
 
                 pkpkVoltage = voltage;
@@ -524,28 +526,33 @@ namespace FrequencyGenerator
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            timer1.Start();
             setAllControls(true);
             stopButton.Enabled = false;
         }
 
         private void stopButton_Click(object sender, EventArgs e)
         {
-            // Cancel the asynchronous operation. 
-            backgroundWorker1.CancelAsync();
+            if (backgroundWorker1.IsBusy == true)
+            {
+                backgroundWorker1.CancelAsync();
+            }
 
-            setAllControls(true);
-            stopButton.Enabled = false;
+            if (backgroundWorker2.IsBusy == true)
+            {
+                backgroundWorker2.CancelAsync();
+            }
         }
 
         private void generateTableButton_Click(object sender, EventArgs e)
         {
-            double freqStart = 0;
-            double freqEnd = 0;
-            double duration = 0;
-            double cycles = 0;
-            double voltage = 0;
-            Boolean error = false;
-            String errorMessage = "";
+            freqStart = 0;
+            freqEnd = 0;
+            duration = 0;
+            cycles = 0;
+            voltage = 0;
+            error = false;
+            errorMessage = "";
 
             if (String.IsNullOrEmpty(freqStartTextBox.Text) ||
                 String.IsNullOrEmpty(freqEndTextBox.Text) ||
@@ -571,7 +578,6 @@ namespace FrequencyGenerator
                     freqStart *= 1000000;
                     break;
             }
-            Console.WriteLine("freqStart", freqStart);
 
             freqEnd = double.Parse(freqEndTextBox.Text);
             switch (freqEndComboBox.Items[freqEndComboBox.SelectedIndex].ToString())
@@ -588,7 +594,6 @@ namespace FrequencyGenerator
                     freqEnd *= 1000000;
                     break;
             }
-            Console.WriteLine("freqStart", freqStart);
 
             duration = double.Parse(durationTextBox.Text);
             cycles = double.Parse(cyclesTextBox.Text);
@@ -596,11 +601,11 @@ namespace FrequencyGenerator
             switch (voltageComboBox.Items[voltageComboBox.SelectedIndex].ToString())
             {
                 case "mV":
-                    freqEnd *= 1;
+                    voltage *= 1;
                     break;
 
                 case "V":
-                    freqEnd *= 1000;
+                    voltage *= 1000;
                     break;
             }
 
@@ -615,20 +620,20 @@ namespace FrequencyGenerator
                 error = true;
                 errorMessage += "-The End Frequency must be between .01 Hz and 10 MHz\n";
             }
-            if (duration < 1 || duration > 30)
+            if (duration < 1 || duration > 1250)
             {
                 error = true;
-                errorMessage += "-The Duration must be between 1 second and 30 seconds\n";
+                errorMessage += "-The Duration must be between 1 second and 1,250 seconds\n";
             }
-            if (cycles < 1 || cycles > 300)
+            if (cycles < 1 || cycles > 10000)
             {
                 error = true;
-                errorMessage += "-The Number of Steps must be between 1 cycle and 300 cycles\n";
+                errorMessage += "-The Number of Steps must be between 1 cycle and 10,000 cycles\n";
             }
-            else if ((cycles / duration) > 10)
+            else if ((cycles / duration) > 8)
             {
                 error = true;
-                errorMessage += "-The Number of Steps per second must be 10 or less\n";
+                errorMessage += "-The Number of cycles per second must be 8 or less\n";
             }
             if (voltage < 2.5 || voltage > 2500)
             {
@@ -650,22 +655,53 @@ namespace FrequencyGenerator
                     return;
                 }
 
-                object misValue = System.Reflection.Missing.Value;
+                misValue = System.Reflection.Missing.Value;
 
                 xlWorkBook = xlApp.Workbooks.Add(misValue);
                 xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
 
-                int row = 1;
-                double freq = freqStart;
-                for (double d = 0; d <= duration; d += (duration/cycles))
+                timer1.Stop();
+                setAllControls(false);
+                stopButton.Enabled = true;
+                generateTableButton.Text = "Preparing";
+                backgroundWorker2.RunWorkerAsync();
+            }
+            else
+            {
+                MessageBox.Show(errorMessage, "Error");
+            }
+        }
+
+        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            int row = 1;
+            double freq = freqStart;
+            for (double d = 0; d <= duration; d += (duration / cycles))
+            {
+                if (worker.CancellationPending)
                 {
-                    xlWorkSheet.Cells[row, 1] = d;
-                    xlWorkSheet.Cells[row, 2] = freq;
-                    xlWorkSheet.Cells[row, 3] = voltage;
-                    freq += (Math.Abs(freqStart - freqEnd) / cycles);
-                    row++;
+                    e.Cancel = true;
+                    return;
                 }
 
+                xlWorkSheet.Cells[row, 1] = d;
+                xlWorkSheet.Cells[row, 2] = freq;
+                xlWorkSheet.Cells[row, 3] = voltage;
+                freq += (Math.Abs(freqStart - freqEnd) / cycles);
+                row++;                
+            }
+        }
+        
+        private void backgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if ((e.Cancelled == true))
+            {
+                xlWorkBook.Close(false, misValue, misValue);
+            }
+            else
+            {
                 saveFileDialog1.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
                 saveFileDialog1.FilterIndex = 2;
                 saveFileDialog1.RestoreDirectory = true;
@@ -675,29 +711,31 @@ namespace FrequencyGenerator
                     {
                         xlWorkBook.SaveAs(Path.GetFullPath(saveFileDialog1.FileName), Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
                     }
-                    catch (Exception) 
+                    catch (Exception)
                     {
                         MessageBox.Show("Error saving excel file", "Error");
                     }
                 }
 
                 xlWorkBook.Close(true, misValue, misValue);
-                xlApp.Quit();
+            }
+            
+            xlApp.Quit();
 
-                releaseObject(xlWorkSheet);
-                releaseObject(xlWorkBook);
-                releaseObject(xlApp);
-            }
-            else
-            {
-                MessageBox.Show(errorMessage, "Error");
-            }
+            releaseObject(xlWorkSheet);
+            releaseObject(xlWorkBook);
+            releaseObject(xlApp);
 
             freqStartTextBox.Text = string.Empty;
             freqEndTextBox.Text = string.Empty;
             durationTextBox.Text = string.Empty;
             cyclesTextBox.Text = string.Empty;
             voltageTextBox.Text = string.Empty;
+
+            timer1.Start();
+            setAllControls(true);
+            stopButton.Enabled = false;
+            generateTableButton.Text = "Generate Table";
         }
 
         private void editTableButton_Click(object sender, EventArgs e)
@@ -765,7 +803,7 @@ namespace FrequencyGenerator
             chartPage.HasLegend = false;
             chartPage.ChartType = Excel.XlChartType.xlXYScatterSmooth;
 
-            object misValue = System.Reflection.Missing.Value;
+            misValue = System.Reflection.Missing.Value;
             Excel.SeriesCollection seriesCollection = chartPage.SeriesCollection();
             Excel.Series series1 = seriesCollection.NewSeries();
             series1.XValues = xlWorkSheet.get_Range("A1", "A" + range.Rows.Count.ToString());
@@ -805,14 +843,14 @@ namespace FrequencyGenerator
                 return;
             }
 
-            object misValue = System.Reflection.Missing.Value;
+            misValue = System.Reflection.Missing.Value;
 
             xlWorkBook = xlApp.Workbooks.Add(misValue);
             xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
 
             xlApp.Visible = true;
         }
-
+        
         private void runTableButton_Click(object sender, EventArgs e)
         {
             xlApp = new Excel.Application();
@@ -840,17 +878,24 @@ namespace FrequencyGenerator
             xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
             range = xlWorkSheet.UsedRange;
 
+            timer1.Stop();
+            setAllControls(false);
+            stopRunButton.Enabled = true;
+            backgroundWorker3.RunWorkerAsync();
+        }
+
+        private void backgroundWorker3_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            
             int rowCount = range.Rows.Count;
             int colCount = range.Columns.Count;
-            Boolean error = false;
-            String errorMessage = "";
+            error = false;
+            errorMessage = "";
 
             if (colCount == 3 && rowCount > 1)
             {
                 // Buffer
-                frequencyLabelValue.Text = "Buffering";
-                frequencyLabelValue.Update();
-
                 List<KeyValuePair<double, double>> buffer = new List<KeyValuePair<double, double>>();
                 buffer.Add(new KeyValuePair<double, double>(0, (range.Cells[1, 2] as Excel.Range).Value2));
                 if ((range.Cells[1, 2] as Excel.Range).Value2 < .01 || (range.Cells[1, 2] as Excel.Range).Value2 > 10000000)
@@ -865,12 +910,35 @@ namespace FrequencyGenerator
                     errorMessage = "Incorrect voltage value" + "\nThe voltage must be between 2.5 mV and 2500 mV";
                 }
 
+                if (error)
+                {
+                    return;
+                }
+
+                Invoke(new MethodInvoker(delegate
+                {
+                    frequencyLabelValue.Text = "Buffering";
+                    frequencyLabelValue.Update();
+                    pkpkLabelValue.Text = "Buffering";
+                    pkpkLabelValue.Update();
+                    rmsLabelValue.Text = "Buffering";
+                    rmsLabelValue.Update();
+                    dBmLabelValue.Text = "Buffering";
+                    dBmLabelValue.Update();
+                }));
+
                 for (int row = 2; row <= rowCount; row++)
                 {
+                    if (worker.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+
                     double time1 = (range.Cells[row - 1, 1] as Excel.Range).Value2;
                     double time2 = (range.Cells[row, 1] as Excel.Range).Value2;
-                    double duration = time2 - time1;
-                    if(duration < .1)
+                    duration = time2 - time1;
+                    if (duration < .125)
                     {
                         error = true;
                         errorMessage = "Time scale too small on row " + row + "\nDuration: " + duration + "\nDuration must be between above .01 seconds";
@@ -889,11 +957,8 @@ namespace FrequencyGenerator
                 }
 
                 // Error checking
-                if(error)
+                if (error)
                 {
-                    MessageBox.Show(errorMessage, "Error");
-                    frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
-                    frequencyLabelValue.Update();
                     return;
                 }
 
@@ -901,26 +966,29 @@ namespace FrequencyGenerator
                 rmsVoltage = Math.Round((pkpkVoltage / (2 * 1.41421356237)), 2);
                 dBm = Math.Round((20 * Math.Log10((pkpkVoltage / 100) / Math.Pow(.05, .5))), 3);
 
-                pkpkLabelValue.Text = string.Format("{0:N1}", pkpkVoltage).Replace(",", "");
-                pkpkLabelValue.Update();
-                rmsLabelValue.Text = string.Format("{0:N2}", rmsVoltage).Replace(",", "");
-                rmsLabelValue.Update();
-                dBmLabelValue.Text = string.Format("{0:N3}", dBm).Replace(",", "");
-                dBmLabelValue.Update();
+                worker.ReportProgress(50);
 
                 // Execution
                 for (int row = 0; row < rowCount; row++)
                 {
                     frequency = buffer[row].Value;
-                    frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
-                    frequencyLabelValue.Update();
+
+                    worker.ReportProgress(50);
 
                     sendSignalData();
+
+                    if (worker.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+
                     Thread.Sleep((int)(buffer[row].Key * 1000));
                 }
             }
             else
             {
+                error = true;
                 errorMessage = "Invalid table structure";
                 if (colCount != 3)
                 {
@@ -930,7 +998,30 @@ namespace FrequencyGenerator
                 {
                     errorMessage += "\nYou must have more than 1 row";
                 }
+            }
+        }
 
+        private void backgroundWorker3_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
+            frequencyLabelValue.Update();
+            pkpkLabelValue.Text = string.Format("{0:N1}", pkpkVoltage).Replace(",", "");
+            pkpkLabelValue.Update();
+            rmsLabelValue.Text = string.Format("{0:N2}", rmsVoltage).Replace(",", "");
+            rmsLabelValue.Update();
+            dBmLabelValue.Text = string.Format("{0:N3}", dBm).Replace(",", "");
+            dBmLabelValue.Update();
+        }
+
+        private void backgroundWorker3_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            updateFrequencyLabel();
+            updatePkPkLabel();
+            updateRmsLabel();
+            updatedBmLabel();
+
+            if(error)
+            {
                 MessageBox.Show(errorMessage, "Error");
             }
 
@@ -940,48 +1031,17 @@ namespace FrequencyGenerator
             releaseObject(xlWorkSheet);
             releaseObject(xlWorkBook);
             releaseObject(xlApp);
-        }
 
-        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
-        {
-            BackgroundWorker worker = sender as BackgroundWorker;
-
-            for (double d = 0; d <= duration; d += (duration / cycles))
-            {
-                worker.ReportProgress((int)(d / duration));
-
-                sendSignalData();
-
-                if (worker.CancellationPending)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-
-                Thread.Sleep((int)((duration / cycles) * 1000));
-                frequency += (Math.Abs(freqStart - freqEnd) / cycles);
-            }
-        }
-
-        private void backgroundWorker2_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            frequencyLabelValue.Text = string.Format("{0:N2}", frequency).Replace(",", "");
-            frequencyLabelValue.Update();
-        }
-
-        private void backgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
+            timer1.Start();
             setAllControls(true);
-            stopButton.Enabled = false;
+            stopRunButton.Enabled = false;
         }
         
         private void stopRunButton_Click(object sender, EventArgs e)
         {
-            // Cancel the asynchronous operation. 
-            backgroundWorker1.CancelAsync();
-
-            setAllControls(true);
-            stopButton.Enabled = false;
+            Console.WriteLine("Stop Run Table Button Pressed");
+            
+            backgroundWorker3.CancelAsync();
         }
 
         private void setConnectControls(Boolean state)
@@ -999,7 +1059,6 @@ namespace FrequencyGenerator
             generateSweepButton.Enabled = state;
             generateTableButton.Enabled = state;
 
-            stopRunButton.Enabled = state;
             runTableButton.Enabled = state;
 
             freqTextBox.Enabled = state;
@@ -1026,7 +1085,6 @@ namespace FrequencyGenerator
             generateSweepButton.Enabled = state;
             generateTableButton.Enabled = state;
 
-            stopRunButton.Enabled = state;
             generateChartButton.Enabled = state;
             editTableButton.Enabled = state;
             createTableButton.Enabled = state;
@@ -1187,6 +1245,12 @@ namespace FrequencyGenerator
             updatedBmLabel();
 
             sendSignalData();
+
+            freqStartTextBox.Text = string.Empty;
+            freqEndTextBox.Text = string.Empty;
+            durationTextBox.Text = string.Empty;
+            cyclesTextBox.Text = string.Empty;
+            voltageTextBox.Text = string.Empty;
         }
     }
 }
