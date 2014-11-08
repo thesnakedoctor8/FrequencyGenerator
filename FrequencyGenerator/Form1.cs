@@ -501,7 +501,7 @@ namespace FrequencyGenerator
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            for (double d = 0; d <= duration; d += (duration / cycles))
+            for (double d = 0; d < duration; d += (duration / cycles))
             {
                 worker.ReportProgress((int)(d / duration));
 
@@ -516,6 +516,8 @@ namespace FrequencyGenerator
                 Thread.Sleep((int)((duration / cycles) * 1000));
                 frequency += (Math.Abs(freqStart - freqEnd) / cycles);
             }
+            worker.ReportProgress(99);
+            sendSignalData();
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -820,7 +822,15 @@ namespace FrequencyGenerator
             xAxis.AxisTitle.Orientation = Excel.XlOrientation.xlHorizontal;
             xAxis.MinimumScale = 0;
             xAxis.MaximumScale = 1.05 * (range.Cells[range.Rows.Count, 1] as Excel.Range).Value2;
-            
+
+            Excel.Trendlines trendlines = (Excel.Trendlines)series1.Trendlines(System.Type.Missing);
+
+            Excel.Trendline newTrendline = trendlines.Add(
+                Microsoft.Office.Interop.Excel.XlTrendlineType.xlPolynomial, 3,
+                System.Type.Missing, System.Type.Missing, System.Type.Missing, System.Type.Missing,
+                true, true, System.Type.Missing);
+            newTrendline.Select();
+
             tempPath = Path.GetTempFileName();
             chartPage.Export(tempPath, "BMP", misValue);
             xlWorkBook.Close(false, misValue, misValue);
@@ -985,6 +995,8 @@ namespace FrequencyGenerator
 
                     Thread.Sleep((int)(buffer[row].Key * 1000));
                 }
+                worker.ReportProgress(99);
+                sendSignalData();
             }
             else
             {

@@ -118,7 +118,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(432, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(426, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -206,7 +206,7 @@
             this.usbLabel.AutoSize = true;
             this.usbLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.usbLabel.ForeColor = System.Drawing.Color.Red;
-            this.usbLabel.Location = new System.Drawing.Point(38, 48);
+            this.usbLabel.Location = new System.Drawing.Point(7, 76);
             this.usbLabel.Name = "usbLabel";
             this.usbLabel.Size = new System.Drawing.Size(101, 13);
             this.usbLabel.TabIndex = 21;
@@ -215,9 +215,9 @@
             // disconnectButton
             // 
             this.disconnectButton.Enabled = false;
-            this.disconnectButton.Location = new System.Drawing.Point(87, 19);
+            this.disconnectButton.Location = new System.Drawing.Point(10, 48);
             this.disconnectButton.Name = "disconnectButton";
-            this.disconnectButton.Size = new System.Drawing.Size(75, 23);
+            this.disconnectButton.Size = new System.Drawing.Size(98, 23);
             this.disconnectButton.TabIndex = 20;
             this.disconnectButton.Text = "Disconnect";
             this.disconnectButton.UseVisualStyleBackColor = true;
@@ -225,9 +225,9 @@
             // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(6, 19);
+            this.connectButton.Location = new System.Drawing.Point(10, 19);
             this.connectButton.Name = "connectButton";
-            this.connectButton.Size = new System.Drawing.Size(75, 23);
+            this.connectButton.Size = new System.Drawing.Size(98, 23);
             this.connectButton.TabIndex = 19;
             this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
@@ -328,9 +328,9 @@
             this.sweepGroupBox.Controls.Add(this.freqEndComboBox);
             this.sweepGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.sweepGroupBox.ForeColor = System.Drawing.Color.Black;
-            this.sweepGroupBox.Location = new System.Drawing.Point(12, 276);
+            this.sweepGroupBox.Location = new System.Drawing.Point(12, 254);
             this.sweepGroupBox.Name = "sweepGroupBox";
-            this.sweepGroupBox.Size = new System.Drawing.Size(272, 199);
+            this.sweepGroupBox.Size = new System.Drawing.Size(278, 217);
             this.sweepGroupBox.TabIndex = 32;
             this.sweepGroupBox.TabStop = false;
             this.sweepGroupBox.Text = "Generate Sweep";
@@ -338,9 +338,9 @@
             // stopButton
             // 
             this.stopButton.Enabled = false;
-            this.stopButton.Location = new System.Drawing.Point(216, 165);
+            this.stopButton.Location = new System.Drawing.Point(216, 162);
             this.stopButton.Name = "stopButton";
-            this.stopButton.Size = new System.Drawing.Size(47, 23);
+            this.stopButton.Size = new System.Drawing.Size(47, 49);
             this.stopButton.TabIndex = 61;
             this.stopButton.Text = "Stop";
             this.stopButton.UseVisualStyleBackColor = true;
@@ -382,9 +382,9 @@
             // generateTableButton
             // 
             this.generateTableButton.Enabled = false;
-            this.generateTableButton.Location = new System.Drawing.Point(9, 165);
+            this.generateTableButton.Location = new System.Drawing.Point(116, 188);
             this.generateTableButton.Name = "generateTableButton";
-            this.generateTableButton.Size = new System.Drawing.Size(101, 23);
+            this.generateTableButton.Size = new System.Drawing.Size(95, 23);
             this.generateTableButton.TabIndex = 38;
             this.generateTableButton.Text = "Generate Table";
             this.generateTableButton.UseVisualStyleBackColor = true;
@@ -394,7 +394,7 @@
             // 
             this.generateSweepButton.Enabled = false;
             this.generateSweepButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.generateSweepButton.Location = new System.Drawing.Point(115, 165);
+            this.generateSweepButton.Location = new System.Drawing.Point(116, 162);
             this.generateSweepButton.Name = "generateSweepButton";
             this.generateSweepButton.Size = new System.Drawing.Size(95, 23);
             this.generateSweepButton.TabIndex = 33;
@@ -506,7 +506,7 @@
             this.tableControlsGroupBox.Controls.Add(this.generateChartButton);
             this.tableControlsGroupBox.Controls.Add(this.editTableButton);
             this.tableControlsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tableControlsGroupBox.Location = new System.Drawing.Point(296, 276);
+            this.tableControlsGroupBox.Location = new System.Drawing.Point(296, 305);
             this.tableControlsGroupBox.Name = "tableControlsGroupBox";
             this.tableControlsGroupBox.Size = new System.Drawing.Size(122, 166);
             this.tableControlsGroupBox.TabIndex = 38;
@@ -518,9 +518,9 @@
             this.groupBox2.Controls.Add(this.disconnectButton);
             this.groupBox2.Controls.Add(this.connectButton);
             this.groupBox2.Controls.Add(this.usbLabel);
-            this.groupBox2.Location = new System.Drawing.Point(216, 201);
+            this.groupBox2.Location = new System.Drawing.Point(296, 201);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(169, 69);
+            this.groupBox2.Size = new System.Drawing.Size(122, 98);
             this.groupBox2.TabIndex = 39;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Connection Status";
@@ -563,9 +563,9 @@
             this.waveformGroupBox.Controls.Add(this.sinusodialRadioButton);
             this.waveformGroupBox.Controls.Add(this.squareRadioButton);
             this.waveformGroupBox.Enabled = false;
-            this.waveformGroupBox.Location = new System.Drawing.Point(127, 201);
+            this.waveformGroupBox.Location = new System.Drawing.Point(62, 201);
             this.waveformGroupBox.Name = "waveformGroupBox";
-            this.waveformGroupBox.Size = new System.Drawing.Size(83, 69);
+            this.waveformGroupBox.Size = new System.Drawing.Size(148, 47);
             this.waveformGroupBox.TabIndex = 40;
             this.waveformGroupBox.TabStop = false;
             this.waveformGroupBox.Text = "Waveform";
@@ -588,7 +588,7 @@
             // 
             this.squareRadioButton.AutoSize = true;
             this.squareRadioButton.ForeColor = System.Drawing.Color.Black;
-            this.squareRadioButton.Location = new System.Drawing.Point(6, 42);
+            this.squareRadioButton.Location = new System.Drawing.Point(85, 19);
             this.squareRadioButton.Name = "squareRadioButton";
             this.squareRadioButton.Size = new System.Drawing.Size(59, 17);
             this.squareRadioButton.TabIndex = 5;
@@ -892,7 +892,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(432, 486);
+            this.ClientSize = new System.Drawing.Size(426, 479);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.signalGroupBox);
             this.Controls.Add(this.waveformGroupBox);
@@ -902,7 +902,10 @@
             this.Controls.Add(this.tableControlsGroupBox);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximumSize = new System.Drawing.Size(442, 518);
+            this.MinimumSize = new System.Drawing.Size(442, 518);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Signal Generator Control Panel";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
